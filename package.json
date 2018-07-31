@@ -1,0 +1,59 @@
+{
+    "name": "uxl-polymer2-ts",
+    "version": "1.0.0",
+    "description": "UXLand Polymer Element",
+    "homepage": "https://bitbucket.org/newuibcn/uxl-polymer2-ts",
+    "author": {
+        "name": "UXLand",
+        "email": "dev@uxland.es",
+        "url": "http://www.uxland.es"
+    },
+    "main": "index.js",
+    "keywords": [
+        "polymer",
+        "web components"
+    ],
+    "devDependencies": {
+        "@polymer/iron-demo-helpers": "^3.0.0-pre.19",
+        "@types/chai": "^4.1.4",
+        "@types/lodash-es": "^4.17.0",
+        "@types/mocha": "^5.2.2",
+        "@types/polymer": "^1.2.4",
+        "@types/redux-mock-store": "^1.0.0",
+        "@types/sinon": "^5.0.1",
+        "@webcomponents/webcomponentsjs": "^2.0.0",
+        "chai": "^4.1.2",
+        "dts-generator": "^2.1.0",
+        "esm": "^3.0.66",
+        "gulp": "^3.9.1",
+        "gulp-run": "^1.7.1",
+        "lodash": "3.10.1",
+        "mocha": "^5.2.0",
+        "mochawesome": "^3.0.2",
+        "nsp": "^2.6.3",
+        "path": "^0.12.7",
+        "redux-mock-store": "https://github.com/dpinart/redux-mock-store.git",
+        "require-dir": "^0.3.2",
+        "rimraf": "^2.6.2",
+        "sinon": "^6.0.0",
+        "typescript": "^2.9.2",
+        "wct-browser-legacy": "^1.0.0"
+    },
+    "dependencies": {
+        "@polymer/polymer": "^3.0.2",
+        "reflect-metadata": "^0.1.12",
+        "tslib": "^1.9.2"
+    },
+    "scripts": {
+        "test": "echo 'TODO: define unit testing'",
+        "dist": "tsc --p gulp/tsconfig-dist.json && gulp generate-d-ts",
+        "tdd": "node --experimental-modules node_modules/mocha/bin/_mocha --watch -r esm --ui tdd --reporter mochawesome test/unit",
+        "postinstall": "gulp dist",
+        "preversion": "rimraf package-lock.json",
+        "postversion": "git checkout master && git push && git push --tags",
+        "prerelease": "npm test",
+        "release": "npm version $semver"
+    },
+    "repository": "https://bitbucket.org/newuibcn/uxl-polymer2-ts",
+    "license": "Apache-2.0"
+}
