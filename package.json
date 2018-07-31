@@ -1,6 +1,6 @@
 {
     "name": "uxl-polymer2-ts",
-    "version": "1.0.0",
+    "version": "0.0.0",
     "description": "UXLand Polymer Element",
     "homepage": "https://bitbucket.org/newuibcn/uxl-polymer2-ts",
     "author": {
@@ -45,6 +45,7 @@
         "tslib": "^1.9.2"
     },
     "scripts": {
+        "build": "tsc -p tsconfig.json",
         "test": "echo 'TODO: define unit testing'",
         "dist": "tsc --p gulp/tsconfig-dist.json && gulp generate-d-ts",
         "tdd": "node --experimental-modules node_modules/mocha/bin/_mocha --watch -r esm --ui tdd --reporter mochawesome test/unit",
