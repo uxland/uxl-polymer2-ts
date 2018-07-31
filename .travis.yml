@@ -1,13 +1,13 @@
 language: javascript
 branches:
   only:
-  - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+  - "/^v\\d+\\.\\d+(\\.\\d+)?(-\\S*)?$/"
 install:
-  - npm install
+- npm install
 before_script:
-  - npm run build
+- npm run build
 script:
-  - npm test
+- npm test
 cache:
   directories:
   - node_modules
@@ -15,7 +15,7 @@ deploy:
   provider: npm
   email: dev@uxland.es
   api_key:
-    secure: M4dGHm6u4wVjN2bd7vcD5Q0LFfOid2RSrMy1cM2fZQxtm/31zUjFSZeJsayRebVQtLLlPILbZAEIiZx2CTYY4EOigBIaYGGVdoX0AsZHfAiJJCp1RUp5KVvdImmC6fu3pqWoQ8B3ORIrDOk4yvV67yGvVr5nwLuRAgE4RP8yrDaW6xOnBPZeh/Q/n5HM/94p90xI8IXvw+baadHLBy4c0bctnyeag3AQA47bwpAk2uvPQwvDnS2eSV1TNbyWJLs/YHqfcR3D5fu657zqswV1J3j0jOBYG/CnT4NnWrjbNVlYu7ytPQpES0A5xaO3PWGs72uZ7/LAAzwlT9/39C8tn5pC1gPPhY0UuFwrtPjt6eBLyyCa6SuvaBoOSQuInvoNdj7ehkaEQnpXMUoNr/kM25bpQWfvsIa248Z1XlQGZ4b4oYOEJA6/uLlf7cPnwmobcY4rPgaWXLtgOqXNueYrc8DWz13MRXZsSV8FowaCSPTyEQ+29Jeg9uOgkqvrsDE03jf1S9pfg1nwVZ1jo9Caz4u8zEjCxEdlbOP83L7UJBlYvPU1W0J3AUrvq1xyM7xShB2/etxCWUDPVf2IL9dmPexq6/ksdR9DctMe81GlstpPY1CU/XQJuWFxCgy5yDHb/CF5AT7WNJifwqTd8f5e5FXXgZ7Qu58qfsJxAzQrDus=
+    secure: EdVsjQSIVcjAQPKspK7pyZcLyHfLRiEvKU61NWfnU9gwzt3TDqvh9fPLFCN9VFjcmN/SO+JXelaRFVHqX6rhjy6bQn9KTST/8JHpUU+5mRonTEJ5Kqw7fhI9w1XQm6+pLObqilGvQYviXThqzb6+R9gP/u18Woek+uQFv2P2ciaRsoLE4u3luKMjHUqobf2R2LKy2jQIw9sQozdqvlp2JaMwWZ3Nye6xYaEIs+xbmNEo1UK24vJrLhKuUH+ScfRFISZ/QbEoJhxxai0hTcNOPe3ntfdwBM71hbM9YL/Z94r+9eDdr8huk+cH0VzR4XdCrN+p2F0aGHVVbsEaoeotbtybGeapLoU1gWrakjv+R+J/CzMX8rFO9/D1jSie3zgKrK9ldvKRQuVeS6Kdmtx2VpnT2aJoRvD6K6Ku6CXjlu4rWNdRk4c5iyRj6mimL8v6efU8Dh1pih1Hbn2d4tZXFlFSbPUEXu7Y/nLThcR6ppeCRmrY6Si8PqJFYPDS0WTtMPMoa3ypZrQ8Q7LxJbGWzXaclKhhL6j6VyIz0Sx19leBVJMc0lwD6gVes3EH6mBUsvJchJZqS6rBUo0B2Tcnb9oIOd+led7E3ifjF9sYCxNbZIvDbEbAWuqLPFW+jNI4wNrPwe3DB9x8Obac18zuwxGgGiaw0T+Ge/4tm09u6jY=
   on:
     tags: true
     repo: uxland/uxl-polymer2-ts
