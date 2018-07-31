@@ -1,14 +1,18 @@
 {
-    "name": "uxl-polymer2-ts",
-    "version": "1.0.0",
-    "description": "UXLand Polymer Element",
-    "homepage": "https://bitbucket.org/newuibcn/uxl-polymer2-ts",
-    "author": {
-        "name": "UXLand",
-        "email": "dev@uxland.es",
-        "url": "http://www.uxland.es"
+    "name": "@uxland/uxl-polymer2-ts",
+    "version": "0.0.0",
+    "description": "UXLand - Utilities",
+    "homepage": "https://github.com/uxland/uxl-polymer2-ts#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/uxland/uxl-polymer2-ts.git"
     },
-    "main": "index.js",
+    "bugs": {
+        "url": "https://github.com/uxland/uxl-polymer2-ts/issues"
+    },
+    "author": "UXLand <dev@uxland.es> (http://www.uxland.es)",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
     "keywords": [
         "polymer",
         "web components"
@@ -55,6 +59,5 @@
         "prerelease": "npm test",
         "release": "npm version $semver"
     },
-    "repository": "https://bitbucket.org/newuibcn/uxl-polymer2-ts",
     "license": "Apache-2.0"
 }
