@@ -5,10 +5,10 @@ cache:
 notifications:
   email: false
 node_js: 10
-before_install:
-  - npx bower install web-component-tester
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+addons:
+  chrome: stable
+script:
+  - xvfb-run npm run test
 after_success:
   - gulp dist
 branches:
