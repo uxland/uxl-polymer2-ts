@@ -1,21 +1,17 @@
-language: javascript
-branches:
-  only:
-  - "/^v\\d+\\.\\d+(\\.\\d+)?(-\\S*)?$/"
-install:
-- npm install
-before_script:
-- npm run build
-script:
-- npm test
+language: node_js
 cache:
   directories:
-  - node_modules
+    - ~/.npm
+notifications:
+  email: false
+node_js: 10
+after_success:
+  - gulp dist
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/
 deploy:
-  provider: npm
-  email: dev@uxland.es
-  api_key:
-    secure: EdVsjQSIVcjAQPKspK7pyZcLyHfLRiEvKU61NWfnU9gwzt3TDqvh9fPLFCN9VFjcmN/SO+JXelaRFVHqX6rhjy6bQn9KTST/8JHpUU+5mRonTEJ5Kqw7fhI9w1XQm6+pLObqilGvQYviXThqzb6+R9gP/u18Woek+uQFv2P2ciaRsoLE4u3luKMjHUqobf2R2LKy2jQIw9sQozdqvlp2JaMwWZ3Nye6xYaEIs+xbmNEo1UK24vJrLhKuUH+ScfRFISZ/QbEoJhxxai0hTcNOPe3ntfdwBM71hbM9YL/Z94r+9eDdr8huk+cH0VzR4XdCrN+p2F0aGHVVbsEaoeotbtybGeapLoU1gWrakjv+R+J/CzMX8rFO9/D1jSie3zgKrK9ldvKRQuVeS6Kdmtx2VpnT2aJoRvD6K6Ku6CXjlu4rWNdRk4c5iyRj6mimL8v6efU8Dh1pih1Hbn2d4tZXFlFSbPUEXu7Y/nLThcR6ppeCRmrY6Si8PqJFYPDS0WTtMPMoa3ypZrQ8Q7LxJbGWzXaclKhhL6j6VyIz0Sx19leBVJMc0lwD6gVes3EH6mBUsvJchJZqS6rBUo0B2Tcnb9oIOd+led7E3ifjF9sYCxNbZIvDbEbAWuqLPFW+jNI4wNrPwe3DB9x8Obac18zuwxGgGiaw0T+Ge/4tm09u6jY=
-  on:
-    tags: true
-    repo: uxland/uxl-polymer2-ts
+  provider: script
+  skip_cleanup: true
+  script:
+    - npx semantic-release
