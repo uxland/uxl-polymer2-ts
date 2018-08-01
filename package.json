@@ -46,7 +46,8 @@
         "sinon": "^6.0.0",
         "travis-deploy-once": "^5.0.1",
         "typescript": "^2.9.2",
-        "wct-browser-legacy": "^1.0.0"
+        "wct-browser-legacy": "^1.0.0",
+        "web-component-tester": "^6.7.1"
     },
     "dependencies": {
         "@polymer/polymer": "^3.0.2",
@@ -55,7 +56,7 @@
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",
-        "test": "polymer test",
+        "test": "wct test/index.html",
         "dist": "tsc --p gulp/tsconfig-dist.json && gulp generate-d-ts",
         "tdd": "node --experimental-modules node_modules/mocha/bin/_mocha --watch -r esm --ui tdd --reporter mochawesome test/unit",
         "prepare": "if [ -d dist ]; then ncp dist/. . && rimraf dist/; fi",
