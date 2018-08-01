@@ -6,7 +6,7 @@ notifications:
   email: false
 node_js: 10
 before_install:
-  - npx bower install web-component-tester
+  - npm i -g polymer-cli
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
 after_success:
