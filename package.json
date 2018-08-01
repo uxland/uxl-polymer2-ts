@@ -56,7 +56,7 @@
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",
-        "test": "wct --config-file wct.config.json",
+        "test": "npm run build && wct --config-file wct.config.json",
         "dist": "tsc --p gulp/tsconfig-dist.json && gulp generate-d-ts",
         "tdd": "node --experimental-modules node_modules/mocha/bin/_mocha --watch -r esm --ui tdd --reporter mochawesome test/unit",
         "prepare": "if [ -d dist ]; then ncp dist/. . && rimraf dist/; fi",
