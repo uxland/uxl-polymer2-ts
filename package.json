@@ -46,8 +46,7 @@
         "sinon": "^6.0.0",
         "travis-deploy-once": "^5.0.1",
         "typescript": "^2.9.2",
-        "wct-browser-legacy": "^1.0.0",
-        "web-component-tester": "^6.7.1"
+        "wct-browser-legacy": "^1.0.0"
     },
     "dependencies": {
         "@polymer/polymer": "^3.0.2",
