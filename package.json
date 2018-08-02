@@ -38,6 +38,7 @@
         "mocha": "^5.2.0",
         "mochawesome": "^3.0.2",
         "ncp": "^2.0.0",
+        "nodemon": "^1.18.3",
         "nsp": "^2.6.3",
         "path": "^0.12.7",
         "redux-mock-store": "https://github.com/dpinart/redux-mock-store.git",
@@ -56,9 +57,11 @@
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",
-        "test": "polymer test",
+        "test:ui:watch": "nodemon --watch test --watch src -x \"polymer test --config-file wct.config.json\"",
+        "test:ui": "polymer test --config-file wct.config.json",
+        "test:unit": "echo 'No unit testing defined'",
         "dist": "tsc --p gulp/tsconfig-dist.json && gulp generate-d-ts",
-        "tdd": "node --experimental-modules node_modules/mocha/bin/_mocha --watch -r esm --ui tdd --reporter mochawesome test/unit",
+        "prepublishOnly": "if [ -d dist ]; then ncp dist/. . && rimraf dist/; fi",
         "travis-deploy-once": "travis-deploy-once",
         "semantic-release": "semantic-release"
     },
