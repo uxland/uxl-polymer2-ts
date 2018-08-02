@@ -60,7 +60,6 @@
         "test:ui:watch": "nodemon --watch test --watch src -x \"polymer test -l chrome\"",
         "test:ui": "polymer test -l chrome",
         "test:unit": "echo 'No unit testing defined'",
-        "test": "npm run build && npm run test:ui && npm run test:unit",
         "dist": "tsc --p gulp/tsconfig-dist.json && gulp generate-d-ts",
         "prepare": "if [ -d dist ]; then ncp dist/. . && rimraf dist/; fi",
         "travis-deploy-once": "travis-deploy-once",
