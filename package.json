@@ -52,8 +52,7 @@
         "@polymer/polymer": "^3.0.2",
         "puppeteer": "^1.6.1",
         "reflect-metadata": "^0.1.12",
-        "tslib": "^1.9.2",
-        "web-component-tester": "^6.7.1"
+        "tslib": "^1.9.2"
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",
