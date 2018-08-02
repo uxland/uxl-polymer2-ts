@@ -9,4 +9,4 @@
 
 ## Usage
 
-`import {customElement, property, computed, observe} from 'uxl-polymer2-ts'`
+`import {customElement, property, computed, observe} from '@uxland/uxl-polymer2-ts'`
