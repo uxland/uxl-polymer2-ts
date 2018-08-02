@@ -1,6 +1,6 @@
 const gulp = require("gulp");
 const run = require("gulp-run");
-const moduleName = "uxl-polymer2-ts";
+const moduleName = "@uxland/uxl-polymer2-ts";
 const path = require("path");
 const nodeModules = "node_modules";
 
