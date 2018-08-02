@@ -1,38 +1,34 @@
-import 'reflect-metadata/Reflect';
+import "reflect-metadata/Reflect";
 export type StatePathFunction = (state: object) => any;
 
 export interface PropertyOptions {
-
-    type?: BooleanConstructor|DateConstructor|NumberConstructor|StringConstructor|
-        ArrayConstructor|ObjectConstructor;
+    type?: BooleanConstructor | DateConstructor | NumberConstructor | StringConstructor | ArrayConstructor | ObjectConstructor;
     notify?: boolean;
     reflectToAttribute?: boolean;
     readOnly?: boolean;
     computed?: string;
     statePath?: string | StatePathFunction;
-    observer?: string |((val: {}, old: {}) => void);
+    observer?: string | ((val: {}, old: {}) => void);
 }
 export interface ElementConstructor extends Function {
     is?: string;
-    properties?: {[prop: string]: PropertyOptions};
+    properties?: { [prop: string]: PropertyOptions };
     observers?: string[];
-    _addDeclarativeEventListener?:
-        (target: string|EventTarget,
-         eventName: string,
-         handler: (ev: Event) => void) => void;
+    _addDeclarativeEventListener?: (target: string | EventTarget, eventName: string, handler: (ev: Event) => void) => void;
 }
 
-export interface ElementPrototype  {
+export interface ElementPrototype {
     constructor: ElementConstructor;
 }
 
 export function observe(targets: string | string[]) {
     return (proto: any, propName: string): any => {
-        const targetString = typeof targets === 'string' ? targets : targets.join(',');
-        const observers = [...proto.constructor.observers || [], `${propName}(${targetString})`]
-            .filter(o => [...proto.__proto__.constructor.observers || []].indexOf(o) === -1);
-        Object.defineProperty(proto.constructor, 'observers', {
-            get(){
+        const targetString = typeof targets === "string" ? targets : targets.join(",");
+        const observers = [...(proto.constructor.observers || []), `${propName}(${targetString})`].filter(
+            o => [...(proto.__proto__.constructor.observers || [])].indexOf(o) === -1
+        );
+        Object.defineProperty(proto.constructor, "observers", {
+            get() {
                 return observers;
             },
             enumerable: true,
@@ -40,13 +36,18 @@ export function observe(targets: string | string[]) {
         });
     };
 }
-const createPolymerProperty = (propConfig: any, proto: any, propName: string) =>{
-    const properties =  Object.keys(Object.assign({}, proto.constructor.properties))
+const createPolymerProperty = (propConfig: any, proto: any, propName: string) => {
+    const properties = Object.keys(Object.assign({}, proto.constructor.properties))
         .filter(key => !proto.__proto__.constructor.properties || !proto.__proto__.constructor.properties[key])
-        .reduce((previousValue, currentValue) => {return {...previousValue, [currentValue]: proto.constructor.properties[currentValue]}}, {[propName]: propConfig});
+        .reduce(
+            (previousValue, currentValue) => {
+                return { ...previousValue, [currentValue]: proto.constructor.properties[currentValue] };
+            },
+            { [propName]: propConfig }
+        );
 
-    Object.defineProperty(proto.constructor, 'properties', {
-        get(){
+    Object.defineProperty(proto.constructor, "properties", {
+        get() {
             return properties;
         },
         enumerable: true,
@@ -56,43 +57,42 @@ const createPolymerProperty = (propConfig: any, proto: any, propName: string) =>
 
 export function computed<T>(name: string, properties: Array<string> = [], observer?: string, type?: any, defValue?: any) {
     return (proto: any, propName: string): any => {
-        let signature = propName + '(' + properties + ')';
-        let propConfig: any = {computed: signature};
-        createPolymerProperty({computed: signature, observer: observer, type: type, value: defValue}, proto, name);
+        let signature = propName + "(" + properties + ")";
+        let propConfig: any = { computed: signature };
+        createPolymerProperty({ computed: signature, observer: observer, type: type, value: defValue }, proto, name);
     };
 }
 
 export function property<T>(options?: PropertyOptions) {
     return (proto: any, propName: string): any => {
-        const notify = (options && options.notify) ? true : false;
-        const reflect = (options && options.reflectToAttribute) ? true : false;
-        const readOnly = (options && options.readOnly) ? true : false;
-        const observer = (options && options.observer) ? options.observer : undefined;
+        const notify = options && options.notify ? true : false;
+        const reflect = options && options.reflectToAttribute ? true : false;
+        const readOnly = options && options.readOnly ? true : false;
+        const observer = options && options.observer ? options.observer : undefined;
 
-        const type = (<any>Reflect).getMetadata('design:type', proto, propName);
-        let propConfig: any = {type: type};
+        const type = (<any>Reflect).getMetadata("design:type", proto, propName);
+        let propConfig: any = { type: type };
         if (notify) propConfig.notify = true;
         if (reflect) propConfig.reflectToAttribute = true;
         if (readOnly) propConfig.readOnly = true;
-        if(observer) propConfig.observer = observer;
-        if(options && options.statePath)
-            propConfig.statePath = options.statePath;
+        if (observer) propConfig.observer = observer;
+        if (options && options.statePath) propConfig.statePath = options.statePath;
         createPolymerProperty(propConfig, proto, propName);
     };
 }
 interface IPolymerElement {
-    $:{[key: string]: HTMLElement};
+    $: { [key: string]: HTMLElement };
 }
 export function item(id: string) {
-    return (proto: any, propName: string) =>{
+    return (proto: any, propName: string) => {
         Object.defineProperty(proto, propName, {
             get(this: IPolymerElement) {
                 return this.$[id];
             },
             enumerable: true,
-            configurable: true,
+            configurable: true
         });
-    }
+    };
 }
 
 export function listen(eventName: string, targetElem?: string) {
@@ -109,7 +109,6 @@ export function listen(eventName: string, targetElem?: string) {
 
 export function gestureListen(eventName: string, targetElem?: string) {
     return (proto: any, functionKey: any) => {
-
         addReadyHandler(proto);
         if (proto.__gestureListeners) {
             proto.__gestureListeners.push({ targetElem, functionKey, eventName });
@@ -125,9 +124,8 @@ function getName(func: any) {
     return func.name ? func.name : func.toString().match(/^function\s*([^\s(]+)/)[1];
 }
 
-function addReadyHandler(proto: any, ) {
-    if (proto.__readyHandlerAdded)
-        return;
+function addReadyHandler(proto: any) {
+    if (proto.__readyHandlerAdded) return;
 
     const ready = proto.ready;
     proto.ready = function registerOnReady(...args: any[]) {
@@ -137,10 +135,12 @@ function addReadyHandler(proto: any, ) {
         // console.log("registering " + proto.__listeners.length + " listeners.")
 
         //Add Polymer Gesture Listeners
-        if (proto.__gestureListeners && Polymer['Gestures']) {
+        if (proto.__gestureListeners && Polymer["Gestures"]) {
             proto.__gestureListeners.forEach((v: any) => {
                 let node = this.$[v.targetElem] || this;
-                Polymer['Gestures'].addListener(node, v.eventName, (e: any) => { this[v.functionKey](e); });
+                Polymer["Gestures"].addListener(node, v.eventName, (e: any) => {
+                    this[v.functionKey](e);
+                });
                 // console.log(node, this[v.functionKey].toString(), v.eventName);
             });
         }
@@ -149,19 +149,15 @@ function addReadyHandler(proto: any, ) {
         if (proto.__listeners) {
             proto.__listeners.forEach((v: any) => {
                 let node = this.$[v.targetElem] || this;
-                node.addEventListener(v.eventName, (e: any) => { this[v.functionKey](e); });
+                node.addEventListener(v.eventName, (e: any) => {
+                    this[v.functionKey](e);
+                });
                 // console.log(node, this[v.functionKey].toString(), v.eventName);
             });
         }
     };
     proto.__readyHandlerAdded = true;
 }
-
-
-
-
-
-
 
 /**
  * A TypeScript class decorator factory that registers the class as a custom
@@ -175,19 +171,13 @@ function addReadyHandler(proto: any, ) {
  */
 
 interface Reflect {
-    hasMetadata?:
-        (metadataKey: string, proto: object, targetKey: string) => boolean;
-    getMetadata?: (metadataKey: string, proto: object, targetKey: string) =>
-        object | undefined;
+    hasMetadata?: (metadataKey: string, proto: object, targetKey: string) => boolean;
+    getMetadata?: (metadataKey: string, proto: object, targetKey: string) => object | undefined;
 }
 
+export const query = _query((target: NodeSelector, selector: string) => target.querySelector(selector));
 
-export const query = _query(
-    (target: NodeSelector, selector: string) => target.querySelector(selector));
-
-export const queryAll = _query(
-    (target: NodeSelector, selector: string) =>
-        target.querySelectorAll(selector));
+export const queryAll = _query((target: NodeSelector, selector: string) => target.querySelectorAll(selector));
 
 /**
  * Creates a decorator function that accepts a selector, and replaces a
@@ -195,38 +185,32 @@ export const queryAll = _query(
  *
  * @param queryFn A function that executes a query with a selector
  */
-function _query(
-    queryFn: (target: NodeSelector, selector: string) =>
-        Element | NodeList | null) {
+function _query(queryFn: (target: NodeSelector, selector: string) => Element | NodeList | null) {
     return (selector: string) => (proto: ElementPrototype, propName: string) => {
         Object.defineProperty(proto, propName, {
             get(this: HTMLElement) {
                 return queryFn(this.shadowRoot!, selector);
             },
             enumerable: true,
-            configurable: true,
+            configurable: true
         });
     };
 }
 
-export type HasEventListener<P extends string> = {
-    [K in P]: (e: Event) => void
-};
+export type HasEventListener<P extends string> = { [K in P]: (e: Event) => void };
 
 export function customElement(tagname?: string) {
-    return (class_: {new (): any}&ElementConstructor) => {
+    return (class_: { new (): any } & ElementConstructor) => {
         if (tagname) {
             // Only check that tag names match when `is` is our own property. It might
             // be inherited from a superclass, in which case it's ok if they're
             // different, and we'll override it with our own property below.
-            if (class_.hasOwnProperty('is')) {
+            if (class_.hasOwnProperty("is")) {
                 if (tagname !== class_.is) {
-                    throw new Error(
-                        `custom element tag names do not match: ` +
-                        `(${tagname} !== ${class_.is})`);
+                    throw new Error(`custom element tag names do not match: ` + `(${tagname} !== ${class_.is})`);
                 }
             } else {
-                Object.defineProperty(class_, 'is', {value: tagname});
+                Object.defineProperty(class_, "is", { value: tagname });
             }
         }
         // Throws if tag name is missing or invalid.

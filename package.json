@@ -57,7 +57,7 @@
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",
-        "test:ui:watch": "nodemon --watch test -x \"polymer test -l chrome\"",
+        "test:ui:watch": "nodemon --watch test --watch src -x \"polymer test -l chrome\"",
         "test:ui": "polymer test -l chrome",
         "test:unit": "echo 'No unit testing defined'",
         "test": "npm run build && npm run test:ui && npm run test:unit",
