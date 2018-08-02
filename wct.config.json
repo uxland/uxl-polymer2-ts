@@ -1,5 +1,5 @@
 {
-    "verbose": false,
+    "verbose": true,
     "suites": ["test/ui/index.html"],
     "plugins": {
         "local": {
