@@ -26,9 +26,10 @@ export interface ElementPrototype  {
     constructor: ElementConstructor;
 }
 
-export function observe(targets: string | string[]) {
+export function observe(firstTarget: string, ...restTargets: string[]) {
+    let targets = [firstTarget, ...restTargets];
     return (proto: any, propName: string): any => {
-        const targetString = typeof targets === 'string' ? targets : targets.join(',');
+        const targetString = targets.join(',');
         const observers = [...proto.constructor.observers || [], `${propName}(${targetString})`]
             .filter(o => [...proto.__proto__.constructor.observers || []].indexOf(o) === -1);
         Object.defineProperty(proto.constructor, 'observers', {
@@ -54,12 +55,23 @@ const createPolymerProperty = (propConfig: any, proto: any, propName: string) =>
     });
 };
 
-export function computed<T>(name: string, properties: Array<string> = [], observer?: string, type?: any, defValue?: any) {
+/*export function computed<T>(name: string, properties: Array<string> = [], observer?: string, type?: any, defValue?: any) {
     return (proto: any, propName: string): any => {
         let signature = propName + '(' + properties + ')';
         let propConfig: any = {computed: signature};
         createPolymerProperty({computed: signature, observer: observer, type: type, value: defValue}, proto, name);
     };
+}*/
+
+export function computed<El extends ElementPrototype>(target : string | string[], observer?: string, type?: any, defValue?: any): (proto: El, propName: string, descriptor: PropertyDescriptor) => void {
+    return (proto: El, propName: string, descriptor: PropertyDescriptor): void =>{
+        const fnName = `__compute${propName}`;
+        Object.defineProperty(proto, fnName, {value: descriptor.get});
+
+        descriptor.get = undefined;
+        const targets = Array.isArray(target) ? target : [target].join(',');
+        createPolymerProperty({computed: `${fnName}(${targets})`, observer, type, value: defValue}, proto, propName);
+    }
 }
 
 export function property<T>(options?: PropertyOptions) {
@@ -83,7 +95,7 @@ export function property<T>(options?: PropertyOptions) {
 interface IPolymerElement {
     $:{[key: string]: HTMLElement};
 }
-export function item(id: string) {
+/*export function item(id: string) {
     return (proto: any, propName: string) =>{
         Object.defineProperty(proto, propName, {
             get(this: IPolymerElement) {
@@ -93,17 +105,18 @@ export function item(id: string) {
             configurable: true,
         });
     }
-}
+}*/
+export const item = (id: string) => query(`#${id}`);
 
-export function listen(eventName: string, targetElem?: string) {
+export function listen(eventName: string, target?: string | EventTarget) {
     return (proto: any, functionKey: any) => {
         addReadyHandler(proto);
         if (proto.__listeners) {
-            proto.__listeners.push({ targetElem, functionKey, eventName });
+            proto.__listeners.push({ target, functionKey, eventName });
             return;
         }
 
-        proto.__listeners = [{ targetElem, functionKey, eventName }];
+        proto.__listeners = [{ target, functionKey, eventName }];
     };
 }
 
@@ -137,7 +150,7 @@ function addReadyHandler(proto: any, ) {
         // console.log("registering " + proto.__listeners.length + " listeners.")
 
         //Add Polymer Gesture Listeners
-        if (proto.__gestureListeners && Polymer['Gestures']) {
+        if (proto.__gestureListeners && Polymer && Polymer['Gestures']) {
             proto.__gestureListeners.forEach((v: any) => {
                 let node = this.$[v.targetElem] || this;
                 Polymer['Gestures'].addListener(node, v.eventName, (e: any) => { this[v.functionKey](e); });
@@ -148,9 +161,16 @@ function addReadyHandler(proto: any, ) {
         //Add Event Listeners
         if (proto.__listeners) {
             proto.__listeners.forEach((v: any) => {
-                let node = this.$[v.targetElem] || this;
-                node.addEventListener(v.eventName, (e: any) => { this[v.functionKey](e); });
-                // console.log(node, this[v.functionKey].toString(), v.eventName);
+                let nodes:EventTarget[] = [] ;
+                if(typeof v.target === 'string'){
+                    let queryResult: NodeListOf<Node> = this.shadowRoot.querySelectorAll(v.target);
+                    queryResult.forEach(n => nodes.push(n));
+                }
+                else if(v.target)
+                    nodes.push(v.target);
+                if(nodes.length == 0)
+                    nodes.push(this);
+                nodes.forEach(n => n.addEventListener(v.eventName, (e: Event) => {this[v.functionKey](e)}));
             });
         }
     };
