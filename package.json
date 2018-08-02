@@ -60,7 +60,7 @@
         "test:ui": "polymer test --config-file wct.config.json",
         "test:unit": "echo 'No unit testing defined'",
         "dist": "tsc --p gulp/tsconfig-dist.json && gulp generate-d-ts",
-        "prepare": "if [ -d dist ]; then ncp dist/. . && rimraf dist/; fi",
+        "prepublishOnly": "if [ -d dist ]; then ncp dist/. . && rimraf dist/; fi",
         "travis-deploy-once": "travis-deploy-once",
         "semantic-release": "semantic-release"
     },
