@@ -1,7 +1,6 @@
 import { PolymerElement, html } from "@polymer/polymer/polymer-element.js";
 import { computed, customElement, property } from "../../src/index";
 const should = chai.should();
-//import {suite} from "mocha";
 suite("property fixture", () => {
     test("property created", () => {
         @customElement("my-element")
