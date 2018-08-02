@@ -4,7 +4,6 @@ cache:
     - ~/.npm
 dist: trusty
 sudo: required
-
 notifications:
   email: false
 node_js: 10
