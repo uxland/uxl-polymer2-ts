@@ -1,5 +1,5 @@
 import {PolymerElement, html} from "@polymer/polymer/polymer-element";
-import {customElement, listen} from "../src";
+import {customElement, listen} from "../../src";
 import * as sinon from 'sinon';
 import {LitElement, html as litHtml} from "@polymer/lit-element";
 const assert = chai.assert;
