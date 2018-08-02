@@ -15,6 +15,6 @@ suite("item-fixture", () => {
         let component: Component = <any>document.createElement("custom-element");
         container.appendChild(<any>component);
         should.exist(component.h1);
-        should.equal(component.h1.innerText, "MyComponent22");
+        should.equal(component.h1.innerText, "MyComponent");
     });
 });
