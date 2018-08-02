@@ -13,7 +13,7 @@ addons:
 before_script:
   - npm i -g polymer-cli
 script:
-  - xvfb-run npm run test
+  - xvfb-run npm test
 after_success:
   - gulp dist
 branches:
