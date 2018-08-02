@@ -1,7 +1,9 @@
 {
     "verbose": false,
+    "suites": ["test/ui/index.html"],
     "plugins": {
         "local": {
+            "skipSeleniumInstall": true,
             "browsers": ["chrome"]
         }
     }

@@ -57,8 +57,8 @@
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",
-        "test:ui:watch": "nodemon --watch test --watch src -x \"polymer test -l chrome\"",
-        "test:ui": "polymer test -l chrome",
+        "test:ui:watch": "nodemon --watch test --watch src -x \"polymer test --config-file wct.config.json\"",
+        "test:ui": "polymer test --config-file wct.config.json",
         "test:unit": "echo 'No unit testing defined'",
         "dist": "tsc --p gulp/tsconfig-dist.json && gulp generate-d-ts",
         "prepare": "if [ -d dist ]; then ncp dist/. . && rimraf dist/; fi",
