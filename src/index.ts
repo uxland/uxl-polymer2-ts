@@ -10,12 +10,10 @@ export interface PropertyOptions {
     readOnly?: boolean;
     computed?: string;
     statePath?: string | StatePathFunction;
-    observer?: string |((val: {}, old: {}) => void);
 }
 export interface ElementConstructor extends Function {
     is?: string;
     properties?: {[prop: string]: PropertyOptions};
-    observers?: string[];
     _addDeclarativeEventListener?:
         (target: string|EventTarget,
          eventName: string,
@@ -26,21 +24,6 @@ export interface ElementPrototype  {
     constructor: ElementConstructor;
 }
 
-export function observe(firstTarget: string, ...restTargets: string[]) {
-    let targets = [firstTarget, ...restTargets];
-    return (proto: any, propName: string): any => {
-        const targetString = targets.join(',');
-        const observers = [...proto.constructor.observers || [], `${propName}(${targetString})`]
-            .filter(o => [...proto.__proto__.constructor.observers || []].indexOf(o) === -1);
-        Object.defineProperty(proto.constructor, 'observers', {
-            get(){
-                return observers;
-            },
-            enumerable: true,
-            configurable: true
-        });
-    };
-}
 const createPolymerProperty = (propConfig: any, proto: any, propName: string) =>{
     const properties =  Object.keys(Object.assign({}, proto.constructor.properties))
         .filter(key => !proto.__proto__.constructor.properties || !proto.__proto__.constructor.properties[key])
@@ -54,58 +37,22 @@ const createPolymerProperty = (propConfig: any, proto: any, propName: string) =>
         configurable: true
     });
 };
-
-/*export function computed<T>(name: string, properties: Array<string> = [], observer?: string, type?: any, defValue?: any) {
-    return (proto: any, propName: string): any => {
-        let signature = propName + '(' + properties + ')';
-        let propConfig: any = {computed: signature};
-        createPolymerProperty({computed: signature, observer: observer, type: type, value: defValue}, proto, name);
-    };
-}*/
-
-export function computed<El extends ElementPrototype>(target : string | string[], observer?: string, type?: any, defValue?: any): (proto: El, propName: string, descriptor: PropertyDescriptor) => void {
-    return (proto: El, propName: string, descriptor: PropertyDescriptor): void =>{
-        const fnName = `__compute${propName}`;
-        Object.defineProperty(proto, fnName, {value: descriptor.get});
-
-        descriptor.get = undefined;
-        const targets = Array.isArray(target) ? target : [target].join(',');
-        createPolymerProperty({computed: `${fnName}(${targets})`, observer, type, value: defValue}, proto, propName);
-    }
-}
-
 export function property<T>(options?: PropertyOptions) {
     return (proto: any, propName: string): any => {
         const notify = (options && options.notify) ? true : false;
         const reflect = (options && options.reflectToAttribute) ? true : false;
         const readOnly = (options && options.readOnly) ? true : false;
-        const observer = (options && options.observer) ? options.observer : undefined;
-
         const type = (<any>Reflect).getMetadata('design:type', proto, propName);
         let propConfig: any = {type: type};
         if (notify) propConfig.notify = true;
         if (reflect) propConfig.reflectToAttribute = true;
         if (readOnly) propConfig.readOnly = true;
-        if(observer) propConfig.observer = observer;
         if(options && options.statePath)
             propConfig.statePath = options.statePath;
         createPolymerProperty(propConfig, proto, propName);
     };
 }
-interface IPolymerElement {
-    $:{[key: string]: HTMLElement};
-}
-/*export function item(id: string) {
-    return (proto: any, propName: string) =>{
-        Object.defineProperty(proto, propName, {
-            get(this: IPolymerElement) {
-                return this.$[id];
-            },
-            enumerable: true,
-            configurable: true,
-        });
-    }
-}*/
+
 export const item = (id: string) => query(`#${id}`);
 
 export function listen(eventName: string, target?: string | EventTarget) {

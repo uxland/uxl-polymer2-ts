@@ -1,5 +1,5 @@
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
-import {computed, customElement, property} from "../../src/index";
+import {customElement, property} from "../../src/index";
 import {LitElement, html as litHtml} from "@polymer/lit-element";
 const should = chai.should();
 const fixtureElementName = 'polymer-decorators-fixture';
@@ -26,29 +26,6 @@ suite('property fixture', () =>{
         }
         should.exist(Component['properties']['myProperty']);
         should.equal(Component['properties']['myProperty'].type, String);
-    });
-    test('computed default value', () =>{
-        let componentName = getDefaultComponentName();
-        @customElement(componentName)
-        class Component extends PolymerElement{
-            static get template() {
-                return html `<h1 id="header">hello</h1>`;
-            }
-            //myDefValue: boolean;
-            @property()
-            myProperty: string;
-            @computed('myProperty', undefined, Boolean, false)
-            get myDefValue(): Boolean{
-                return this.myProperty == 'hello';
-            }
-            connectedCallback(){
-                super.connectedCallback();
-            }
-        }
-        let component = addComponentToFixture<Component>(componentName)
-        should.equal(component.myDefValue, false);
-        component.myProperty = 'hello';
-        should.equal(component.myDefValue, true);
     });
 });
 
