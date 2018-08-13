@@ -1,4 +1,6 @@
 import 'reflect-metadata/Reflect';
+import {LitElement} from "@polymer/lit-element";
+import EventEmitter = NodeJS.EventEmitter;
 export type StatePathFunction = (state: object) => any;
 
 export interface PropertyOptions {
@@ -84,43 +86,41 @@ export function gestureListen(eventName: string, targetElem?: string) {
 function getName(func: any) {
     return func.name ? func.name : func.toString().match(/^function\s*([^\s(]+)/)[1];
 }
-
-function addReadyHandler(proto: any, ) {
+interface EventHandler {
+    node: EventTarget;
+    handler: (e) => void;
+    eventName: string;
+}
+function addReadyHandler(proto: any) {
     if (proto.__readyHandlerAdded)
         return;
 
-    const ready = proto.ready;
-    proto.ready = function registerOnReady(...args: any[]) {
-        ready.apply(this, args);
-
-        // console.log("registering " + proto.__gestureListeners.length + " gestures.")
-        // console.log("registering " + proto.__listeners.length + " listeners.")
-
-        //Add Polymer Gesture Listeners
-        if (proto.__gestureListeners && Polymer && Polymer['Gestures']) {
-            proto.__gestureListeners.forEach((v: any) => {
-                let node = this.$[v.targetElem] || this;
-                Polymer['Gestures'].addListener(node, v.eventName, (e: any) => { this[v.functionKey](e); });
-                // console.log(node, this[v.functionKey].toString(), v.eventName);
-            });
-        }
-
-        //Add Event Listeners
-        if (proto.__listeners) {
-            proto.__listeners.forEach((v: any) => {
-                let nodes:EventTarget[] = [] ;
-                if(typeof v.target === 'string'){
-                    let queryResult: NodeListOf<Node> = this.shadowRoot.querySelectorAll(v.target);
-                    queryResult.forEach(n => nodes.push(n));
-                }
-                else if(v.target)
-                    nodes.push(v.target);
-                if(nodes.length == 0)
-                    nodes.push(this);
-                nodes.forEach(n => n.addEventListener(v.eventName, (e: Event) => {this[v.functionKey](e)}));
-            });
-        }
-    };
+    const connectedCallback = proto.connectedCallback;
+    const disconnectCallback = proto.disconnectCallback;
+    proto.connectedCallback = async function register(...args: any[]){
+        connectedCallback.apply(this, args);
+        await this.renderComplete;
+        let handlers: EventHandler[] = [];
+        (proto.__listeners || []).forEach(v =>{
+            let nodes:EventTarget[] = [] ;
+           if(typeof v.target === 'string'){
+               let queryResult: NodeListOf<Node> = this.shadowRoot.querySelectorAll(v.target);
+               queryResult.forEach(n => nodes.push(n));
+           }
+           else nodes.push(v.target);
+           nodes.forEach(node => {
+               let handler: EventHandler = {eventName: v.eventName, node, handler: ((e) => this[v.functionKey](e)).bind(this)};
+               node.addEventListener(v.eventName, handler.handler);
+               handlers.push(handler)
+           });
+        });
+        this.__listenersEventHandlers = handlers;
+    }
+    proto.disconnectCallback = function unregister(...args: any[]){
+        disconnectCallback.apply(args, this);
+        (this.__listenersEventHandlers as EventHandler[]).forEach(handler => handler.node.removeEventListener(handler.eventName, handler.handler));
+        this.__listenersEventHandlers = [];
+    }
     proto.__readyHandlerAdded = true;
 }
 
