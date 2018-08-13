@@ -98,8 +98,7 @@ function addReadyHandler(proto: any) {
     const connectedCallback = proto.connectedCallback;
     const disconnectCallback = proto.disconnectCallback;
     proto.connectedCallback = async function register(...args: any[]){
-        connectedCallback.apply(this, args);
-        await this.renderComplete;
+        await connectedCallback.apply(this, args);
         let handlers: EventHandler[] = [];
         (proto.__listeners || []).forEach(v =>{
             let nodes:EventTarget[] = [] ;
