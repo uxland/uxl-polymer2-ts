@@ -123,12 +123,6 @@ function addReadyHandler(proto: any) {
     proto.__readyHandlerAdded = true;
 }
 
-
-
-
-
-
-
 /**
  * A TypeScript class decorator factory that registers the class as a custom
  * element.
