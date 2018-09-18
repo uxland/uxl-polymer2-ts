@@ -101,7 +101,7 @@ function addReadyHandler(proto: any) {
     };
     proto.updated = function(changedProperties){
         if(updated)
-            updated(changedProperties);
+            updated.call(this, changedProperties);
         this.__unsubscribeFromListeners();
         let handlers: EventHandler[] = [];
         (proto.__listeners || []).forEach(v =>{
@@ -109,7 +109,10 @@ function addReadyHandler(proto: any) {
             if(typeof v.target === 'string'){
                 let queryResult: NodeListOf<Node> = this.shadowRoot.querySelectorAll(v.target);
                 queryResult.forEach(n => nodes.push(n));
+                queryResult = this.querySelectorAll(v.target);
+                queryResult.forEach(n => nodes.push(n));
             }
+
             else nodes.push(v.target);
             nodes.forEach(node => {
                 let handler: EventHandler = {eventName: v.eventName, node, handler: ((e) => this[v.functionKey](e)).bind(this)};
@@ -121,7 +124,7 @@ function addReadyHandler(proto: any) {
     };
     proto.disconnectCallback = function(){
         if(disconnectCallback)
-            disconnectCallback();
+            disconnectCallback.call(this);
         this.__unsubscribeFromListeners();
     };
 
