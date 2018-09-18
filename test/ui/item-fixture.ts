@@ -1,15 +1,14 @@
 import {customElement, item} from "../../src/index";
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import {html as litHtml, LitElement} from '@polymer/lit-element/lit-element';
+import {html, LitElement} from '@polymer/lit-element/lit-element';
 const {assert} = chai;
 const should = chai.should();
 
 suite('item-fixture', () =>{
     const fixtureElementName = 'polymer-decorators-fixture';
-    test('create item', () =>{
+    test('create item', async() =>{
         @customElement('custom-element')
-        class Component extends PolymerElement {
-            static get template(){
+        class Component extends LitElement {
+            render(){
                 return html `<h1 id="header">MyComponent</h1>`;
             }
             @item('header')
@@ -18,14 +17,15 @@ suite('item-fixture', () =>{
         let container: HTMLDivElement = fixture(fixtureElementName);
         let component: Component = <any>document.createElement('custom-element');
         container.appendChild(<any>component);
+        await component.updateComplete;
         should.exist(component.h1);
         assert.equal(component.h1.innerText, 'MyComponent');
     });
     test('lit element', async() =>{
         @customElement('custom-lit-element')
         class Component extends LitElement{
-            _render(props: LitElement){
-                return litHtml `<span id="my-span">Hello world</span>`
+            render(){
+                return html `<span id="my-span">Hello world</span>`
             }
             @item('my-span')
             mySpan: HTMLSpanElement;
@@ -33,9 +33,9 @@ suite('item-fixture', () =>{
         let container: HTMLDivElement = fixture(fixtureElementName);
         let component: Component = <any>document.createElement('custom-lit-element');
         container.appendChild(<any>component);
-        component.requestRender();
-        await component.renderComplete;
-        should.exist(component.mySpan)
+        component.requestUpdate();
+        await component.updateComplete;
+        should.exist(component.mySpan);
         assert.equal(component.mySpan.constructor, HTMLSpanElement);
     });
 });

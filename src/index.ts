@@ -1,6 +1,4 @@
 import 'reflect-metadata/Reflect';
-import {LitElement} from "@polymer/lit-element";
-import EventEmitter = NodeJS.EventEmitter;
 export type StatePathFunction = (state: object) => any;
 
 export interface PropertyOptions {
@@ -41,9 +39,9 @@ const createPolymerProperty = (propConfig: any, proto: any, propName: string) =>
 };
 export function property<T>(options?: PropertyOptions) {
     return (proto: any, propName: string): any => {
-        const notify = (options && options.notify) ? true : false;
-        const reflect = (options && options.reflectToAttribute) ? true : false;
-        const readOnly = (options && options.readOnly) ? true : false;
+        const notify = (options && options.notify);
+        const reflect = (options && options.reflectToAttribute);
+        const readOnly = (options && options.readOnly);
         const type = (<any>Reflect).getMetadata('design:type', proto, propName);
         let propConfig: any = {type: type};
         if (notify) propConfig.notify = true;
@@ -94,32 +92,39 @@ interface EventHandler {
 function addReadyHandler(proto: any) {
     if (proto.__readyHandlerAdded)
         return;
-
-    const connectedCallback = proto.connectedCallback;
     const disconnectCallback = proto.disconnectCallback;
-    proto.connectedCallback = async function register(...args: any[]){
-        await connectedCallback.apply(this, args);
+    const updated = proto.updated;
+    proto.__unsubscribeFromListeners = function(){
+        let handlers: EventHandler[] = this.__listenersEventHandlers || [];
+        handlers.forEach(handler => handler.node.removeEventListener(handler.eventName, handler.handler));
+        this.__listenersEventHandlers = [];
+    };
+    proto.updated = function(changedProperties){
+        if(updated)
+            updated(changedProperties);
+        this.__unsubscribeFromListeners();
         let handlers: EventHandler[] = [];
         (proto.__listeners || []).forEach(v =>{
             let nodes:EventTarget[] = [] ;
-           if(typeof v.target === 'string'){
-               let queryResult: NodeListOf<Node> = this.shadowRoot.querySelectorAll(v.target);
-               queryResult.forEach(n => nodes.push(n));
-           }
-           else nodes.push(v.target);
-           nodes.forEach(node => {
-               let handler: EventHandler = {eventName: v.eventName, node, handler: ((e) => this[v.functionKey](e)).bind(this)};
-               node.addEventListener(v.eventName, handler.handler);
-               handlers.push(handler)
-           });
+            if(typeof v.target === 'string'){
+                let queryResult: NodeListOf<Node> = this.shadowRoot.querySelectorAll(v.target);
+                queryResult.forEach(n => nodes.push(n));
+            }
+            else nodes.push(v.target);
+            nodes.forEach(node => {
+                let handler: EventHandler = {eventName: v.eventName, node, handler: ((e) => this[v.functionKey](e)).bind(this)};
+                node.addEventListener(v.eventName, handler.handler);
+                handlers.push(handler)
+            });
         });
         this.__listenersEventHandlers = handlers;
-    }
-    proto.disconnectCallback = function unregister(...args: any[]){
-        disconnectCallback.apply(args, this);
-        (this.__listenersEventHandlers as EventHandler[]).forEach(handler => handler.node.removeEventListener(handler.eventName, handler.handler));
-        this.__listenersEventHandlers = [];
-    }
+    };
+    proto.disconnectCallback = function(){
+        if(disconnectCallback)
+            disconnectCallback();
+        this.__unsubscribeFromListeners();
+    };
+
     proto.__readyHandlerAdded = true;
 }
 
@@ -174,22 +179,22 @@ export type HasEventListener<P extends string> = {
 };
 
 export function customElement(tagname?: string) {
-    return (class_: {new (): any}&ElementConstructor) => {
+    return (class_: {new (): any}) => {
         if (tagname) {
             // Only check that tag names match when `is` is our own property. It might
             // be inherited from a superclass, in which case it's ok if they're
             // different, and we'll override it with our own property below.
             if (class_.hasOwnProperty('is')) {
-                if (tagname !== class_.is) {
+                if (tagname !== (<any>class_).is) {
                     throw new Error(
                         `custom element tag names do not match: ` +
-                        `(${tagname} !== ${class_.is})`);
+                        `(${tagname} !== ${(<any>class_).is})`);
                 }
             } else {
                 Object.defineProperty(class_, 'is', {value: tagname});
             }
         }
         // Throws if tag name is missing or invalid.
-        window.customElements.define(class_.is!, class_);
+        window.customElements.define((<any>class_).is!, class_);
     };
 }
